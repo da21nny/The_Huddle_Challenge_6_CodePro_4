@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 # 1. Carga de datos
 # Asegúrate de colocar el archivo CSV en el mismo directorio o cambiar la ruta
-file_path = 'dataset.csv' 
+file_path = '../docs/server_logs.csv' 
 try:
     df = pd.read_csv(file_path)
     
@@ -37,7 +37,7 @@ try:
     # 6.2 Detección del momento crítico
     print("=== 6.2 Detección del Momento Crítico ===")
     # Agrupamos los datos estableciendo el timestamp como índice temporal en ventanas de 5 minutos
-    df_grouped_5min = df.set_index('timestamp_event').resample('5T')
+    df_grouped_5min = df.set_index('timestamp_event').resample('5min')
     
     # Generamos nuestra tabla con métricas por ventana
     windows_df = pd.DataFrame({
@@ -126,7 +126,7 @@ try:
     
     # --- GRÁFICO 1: Eventos por severidad en bins de 5 min ---
     # Usamos pd.Grouper para agrupar en columnas por severidad y filas por tiempo de 5 minutos
-    severity_counts = df.groupby([pd.Grouper(key='timestamp_event', freq='5T'), 'severity']).size().unstack(fill_value=0)
+    severity_counts = df.groupby([pd.Grouper(key='timestamp_event', freq='5min'), 'severity']).size().unstack(fill_value=0)
     
     # Nos aseguramos de tener la base de las 4 severidades posibles requeridas
     for col in ['INFO', 'WARN', 'ERROR', 'CRITICAL']:

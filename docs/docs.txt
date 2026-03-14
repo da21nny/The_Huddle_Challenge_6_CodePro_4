@@ -1,0 +1,173 @@
+1️⃣ Escenario y Desafío 🔍
+El sistema de logging distribuido ya está en funcionamiento.
+Todos los servicios registran:
+
+Qué request se ejecutó
+En qué endpoint
+Con qué status
+Cuánto tardó
+En qué momento ocurrió
+Mensajes y severidades
+El sistema funciona… pero hubo quejas:
+“El sistema estuvo lento.”
+“Un servicio explotó.”
+“Algo pasó en un horario específico.”
+
+Operaciones no quiere decir hipótesis.
+Quiere evidencia.
+Tu tarea no es agregar más logs.
+Es entender qué ocurrió usando los que ya existen.
+
+2️⃣ Objetivo del Challenge 🎯
+Analizar el dataset y construir una explicación clara sobre:
+
+Cuándo el sistema estuvo peor
+Qué servicio fue el más afectado
+Qué parte del sistema se vio más comprometida (endpoint)
+Qué tipo de errores dominaron
+Qué cambió durante el incidente respecto a un baseline
+No hay una única forma “bonita” de presentarlo.
+Pero sí hay una regla:
+Tus conclusiones deben estar respaldadas por datos reproducibles.
+
+3️⃣ Fuente de Datos 📦 (Contrato)
+Trabajás con un CSV provisto.
+El dataset lo encontras en: https://drive.google.com/file/d/1JuQvmvIsmp965S4-Is8SQAIOnM-PN_CN/view?usp=sharing
+
+Campos principales (pueden variar en orden, pero deben existir):
+
+timestamp_event
+received_at
+service_name
+severity
+message
+method
+endpoint
+status_code
+latency_ms
+trace_id
+Otros campos como host, env, region, log_type pueden existir y son opcionales.
+No inventes columnas.
+No inventes datos.
+Trabajá con lo que hay.
+
+4️⃣ Herramientas Permitidas 🛠
+Podés usar:
+
+Jupyter Notebook (obligatorio)
+Pandas
+Matplotlib
+Se evalúa:
+
+Claridad
+Evidencia cuantitativa
+Reproducibilidad
+No se evalúa:
+
+Estética
+Complejidad innecesaria
+🔎 Mini Guía Rápida
+
+Pandas: leer CSV, filtrar, agrupar, contar, resumir, crear bins temporales.
+Matplotlib: visualizar tendencias y comparaciones (picos, concentraciones, cambios en el tiempo).
+5️⃣ Definiciones Operativas (Obligatorias) ✅
+Para que todos analicen lo mismo:
+
+Time window (bin):
+Agrupación en ventanas de 5 minutos usando timestamp_event.
+
+Bad event:
+Un registro se considera “malo” si cumple al menos uno:
+
+severity es ERROR o CRITICAL
+status_code >= 500
+Bad rate:
+bad_events / total_events dentro de cada ventana.
+
+Momento crítico:
+La ventana de 5 minutos con mayor bad_rate, aplicando filtro:
+total_events >= 20
+
+Baseline:
+Todo el tiempo fuera del momento crítico (resto del dataset).
+
+6️⃣ Lo que se espera de tu análisis 🧠
+Tu notebook debe producir, como mínimo, estos outputs:
+
+6.1 Exploración inicial
+Responder con tablas:
+
+¿Cuántos logs hay en total?
+¿Qué severidad aparece más?
+¿Qué servicio genera más logs?
+¿Qué servicio genera menos logs?
+¿Cuál es el mensaje más repetido?
+¿Cuál es el mensaje “malo” más repetido? (bad events)
+6.2 Detección del momento crítico
+Generar una tabla (top 5) con:
+
+window_start
+total_events
+bad_events
+bad_rate Seleccionar el momento crítico (top 1 por regla).
+6.3 Diagnóstico dentro del momento crítico
+Dentro de esa ventana (top 1), generar:
+
+Tabla: bad events por service_name (ranking)
+Tabla: top 5 message en bad events
+Tabla: top 5 endpoint más comprometidos
+Elegí 1 criterio y declaralo explícitamente:
+
+Por cantidad de bad events
+Por cantidad de status_code >= 500
+Por mayor latency_ms promedio (Nada avanzado. Solo promedio si elegís latencia.)
+6.4 “Qué cambió” (Incidente vs Baseline)
+Comparar momento crítico vs baseline con una tabla simple que incluya:
+
+total_events
+bad_rate
+avg_latency_ms
+%_5xx (porcentaje de status_code >= 500)
+7️⃣ Gráficos obligatorios 📊 (exactamente 2)
+Para sostener visualmente lo que calculaste:
+
+Gráfico 1 (temporal):
+Conteo de eventos por severidad en bins de 5 min (INFO / WARN / ERROR / CRITICAL).
+
+Gráfico 2 (temporal):
+bad_rate o %_5xx en bins de 5 min.
+
+Reglas:
+
+Títulos claros
+Ejes claros
+Valores legibles
+No se evalúa “bonito”, se evalúa que se entienda
+8️⃣ Entrega 📑
+Debés entregar:
+1 notebook reproducible (.ipynb) que corra de arriba a abajo.
+
+Conclusiones al final en 5–8 líneas, incluyendo:
+
+Momento crítico (hora exacta)
+Servicio más afectado
+Endpoint más comprometido
+Mensaje dominante
+Comparación incidente vs baseline (1–2 números clave)
+Si alguien corre tu notebook, tiene que llegar al mismo resultado.
+
+9️⃣ Bonus 🚀 (Opcional)
+Si querés ir más allá:
+
+Elegí un trace_id dentro del momento crítico
+Mostrá la secuencia ordenada por timestamp_event
+Explicá dónde aparece el primer bad event y qué servicios participaron
+No es obligatorio. Pero es lo más cercano a pensar distribuido.
+
+🔟 Regla Final ⚖️
+Este challenge no es de escribir más código.
+Es de criterio sustentado en datos.
+
+Si tu análisis termina en:
+“Hubo muchos errores”
+No hiciste diagnóstico.

@@ -15,6 +15,11 @@ try:
     # Definimos lo que es un "bad event" según el criterio: severidad de ERROR/CRITICAL o status >= 500
     df['is_bad_event'] = df['severity'].isin(['ERROR', 'CRITICAL']) | (df['status_code'] >= 500)
 
+
+
+
+
+
     # 6.1 Exploración inicial
     total_logs = len(df)
     most_common_severity = df['severity'].mode()[0]
@@ -33,6 +38,11 @@ try:
     print(f"Servicio con menos logs: {service_least_logs}")
     print(f"Mensaje más repetido: {most_common_message}")
     print(f"Mensaje 'malo' más repetido: {most_common_bad_message}\n")
+
+
+
+
+
 
     # 6.2 Detección del momento crítico
     print("=== 6.2 Detección del Momento Crítico ===")
@@ -66,6 +76,11 @@ try:
     
     print(f"\n-> Momento crítico seleccionado: de {critical_moment_start} a {critical_moment_end}\n")
 
+
+
+
+
+
     # 6.3 Diagnóstico dentro del momento crítico
     print("=== 6.3 Diagnóstico dentro del Momento Crítico ===")
     
@@ -90,6 +105,11 @@ try:
     top_5_endpoints_by_bad_events = incident_bad_events['endpoint'].value_counts().head(5)
     print("\nTop 5 endpoints más comprometidos (Criterio: Por cantidad absoluta de bad events):")
     print(top_5_endpoints_by_bad_events.to_string(), "\n")
+
+
+
+
+
 
     # 6.4 “Qué cambió” (Incidente vs Baseline)
     print("=== 6.4 Comparación Incidente vs Baseline ===")
@@ -120,6 +140,11 @@ try:
         columns=['total_events', 'bad_rate', 'avg_latency_ms', '%_5xx']
     )
     print(comparison_df.to_string())
+
+
+
+
+
 
     # 7. Gráficos Obligatorios
     print("\nGenerando gráficos...")
@@ -152,6 +177,11 @@ try:
     plt.ylabel('Bad Rate (Ratio entre 0 y 1)')
     plt.grid(True, linestyle='--', alpha=0.6)
     plt.show()
+
+
+
+
+
 
     # 8. Conclusiones Finales (Entrega)
     
